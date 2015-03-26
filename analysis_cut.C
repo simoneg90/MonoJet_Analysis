@@ -25,6 +25,7 @@ void analysis_cut(){
 
   str<< (!isData ? "puwgt * wgt *" : "")<<"(";  //remember to rescale also for Luminosity and K-factor (1.23 for W-events, 1.27 for Z-events)
 
+
   std::string jet1_cut= str.str() + "njets==1 && signaljetpt>" + jet1PT + " && abs(signaljeteta)<" + jet1ETA + " && signaljetCHfrac>0.2 && signaljetNHfrac<0.7 && signaljetEMfrac<0.7)";
 
   std::cout<<"Prova stringa: "<<jet1_cut<<std::endl;
