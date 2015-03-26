@@ -9,8 +9,8 @@ import ntpath
 import optparse
 
 #=== Cut definitions ===
-pfmetCut1                      = 1000
-pfmetCut                       = 10000
+pfmetCut1                      = 200
+pfmetCut                       = 100000
 mumetCut                       = 200
 signaljetNHfracCut             = 0.7  #NOT TO BE CHANGED
 signaljetEMfracCut             = 0.7  #NOT TO BE CHANGED
@@ -18,8 +18,8 @@ signaljetCHfracCut             = 0.2  #NOT TO BE CHANGED
 njetsCut                       = 2
 secondjetNHfracCut             = 0.7  #NOT TO BE CHANGED
 secondjetEMfracCut             = 0.9  #NOT TO BE CHANGED
-signaljetptCut1                = 1000
-signaljetptCut                 = 10000
+signaljetptCut1                = 200
+signaljetptCut                 = 100000
 signaljetetaCut                = 2.4
 jetjetdphiCut                  = 2.5
 nmuonsCut                      = 0
@@ -132,7 +132,8 @@ for file in files:
   f = TFile.Open(file)
   print("File under study: %s" % (f.GetName()))
   histo_weight= TH1F("histo_weight","histo_weight",100,0.,1.)
-  histo= TH1F("histo","histo", 50,0,2000)
+  string=f.GetName()
+  histo= TH1F(ROOT.Form("histo%s" % (string[41:-10])),"histo", 40,0,2000)
   tree = f.Get('tree/tree')
   #tree.Project(histo_weight.GetName(),'weight')
   #tree.Project(histo.GetName(),var, 'signaljeteta < ' + str(etaCut) + ' && signaljeteta > -' + str(etaCut) + ' && pfmet > ' + str(ptCut))
@@ -149,7 +150,7 @@ for file in files:
   #histo.Scale(integral_signal/integral_back_sum)
   #histo.Scale(histo_weight.GetMean())
   new_counter+=histo.GetEntries()
-  string=f.GetName()
+  #string=f.GetName()
   leg.AddEntry(histo,string[41:-10],"lp")
   histo.Rebin()
   histograms.append(histo)
@@ -159,7 +160,7 @@ for file in files:
 histograms_signal = []
 sig = TFile.Open(signalFile)
 print("Signal file under study: %s" % (sig.GetName()))
-histo_signal= TH1F("histo_signal","histo_signal", 50,0,2000)
+histo_signal= TH1F("histo_signal","histo_signal", 40,0,2000)
 tree = sig.Get('tree/tree')
 #tree.Project(histo_signal.GetName(),var, 'signaljeteta < ' + str(etaCut) + ' && signaljeteta > -' + str(etaCut) + ' && pfmet > ' + str(ptCut))
 tree.Project(histo_signal.GetName(),var,'pfmet>'+str(pfmetCut1)+'&&pfmet<'+str(pfmetCut) +'&& mumet>'+str(mumetCut)+' && signaljetNHfrac<'+str(signaljetNHfracCut)+' && signaljetEMfrac<'+str(signaljetEMfracCut) +' && signaljetCHfrac>'+str(signaljetCHfracCut)+' && (njets<'+str(njetsCut)+' || (secondjetNHfrac<'+str(secondjetNHfracCut)+' && secondjetEMfrac<'+str(secondjetEMfracCut)+'))&& signaljetpt>'+str(signaljetptCut1)+'&&signaljetpt<'+str(signaljetptCut)+' && abs(signaljeteta)<'+str(signaljetetaCut)+' && njets<='+str(njetsCut)+' && (njets==1 || abs(jetjetdphi)<'+str(jetjetdphiCut)+') && nmuons ==     '+str(nmuonsCut)+' && nelectrons == '+str(nelectronsCut)+' && ntaus == '+str(ntausCut))
@@ -170,7 +171,7 @@ string =sig.GetName()
 leg.AddEntry(histo_signal,string[51:-5]+' GeV',"lp")
 leg.SetFillColor(0)
 #histo_signal.Scale(integral_back_sum/integral_signal)
-#histo_signal.Scale(new_counter/histo_signal.GetEntries())
+histo_signal.Scale(new_counter/histo_signal.GetEntries())
 histo_signal.Rebin()
 histo_signal.SetStats(0)
 histograms_signal.append(histo_signal)
@@ -184,6 +185,7 @@ hs = THStack("hs", "hs")
 print("Processing %d files" % (len(files)))
 for i in range(0,len(files)):
   hs.Add(histograms[i])
+  histograms[i].Write()
 
 #hs.Add(histo_signal)
 
