@@ -18,7 +18,7 @@ void breakLine(){
 
 }
 
-Questa funzione stampa una stringa all'interno di un riquadro                                                                                                                    
+//Questa funzione stampa una stringa all'interno di un riquadro
 void frame(std::string stringa){
 
   std::cout<<""<<std::endl;
