@@ -5,7 +5,6 @@
 
 #include "utility.cc"
 #include "cuts.h"
-#include "yield.h"
 
 void analysis_cut(){
 
@@ -23,22 +22,27 @@ void analysis_cut(){
   std::cout<<"Building the string for cuts!!!"<<std::endl;
   breakLine();
 
-  str<< (!isData ? "puwgt * wgt *" : "")<<"(";  //remember to rescale also for Luminosity and K-factor (1.23 for W-events, 1.27 for Z-events)
+  str<<K_factor<<" * "<<LUMI;
+  str<< (!isData ? " * puwgt * wgt *" : "")<<"(";  //remember to rescale also for Luminosity and K-factor (1.23 for W-events, 1.27 for Z-events)
 
-
-  std::string jet1_cut= str.str() + "njets==1 && signaljetpt>" + jet1PT + " && abs(signaljeteta)<" + jet1ETA + " && signaljetCHfrac>0.2 && signaljetNHfrac<0.7 && signaljetEMfrac<0.7)";
+  std::string jet1_cut = str.str() + "signaljetpt>" + jet1PT + " && abs(signaljeteta)<" + jet1ETA + " && signaljetCHfrac>0.2 && signaljetNHfrac<0.7 && signaljetEMfrac<0.7";
 
   std::cout<<"Prova stringa: "<<jet1_cut<<std::endl;
 
-  std::pair<double,double> yld3  = yieldwitherror(path, jet1_cut.c_str(), lumi, 1, "tree/tree");
 
-  std::cout<<yld3.first<<" "<<yld3.second<<std::endl;
+  std::string jet2_cut = jet1_cut + " && secondjetpt>" + jet2PT + "&& abs(secondjeteta)<" + jet2ETA + " && secondjetNHfrac<0.7 && secondjetEMfrac<0.9";
 
+  std::cout<<"Prova stringa: "<<jet2_cut<<std::endl;
 
+  double yld_noCUT= yield(path, (str.str()+"1)").c_str(), lumi, "tree/tree");
+  double yld_jet1= yield(path, (jet1_cut + "&& njets==1)").c_str(), lumi, "tree/tree");
+  double yld_jet2= yield(path, (jet2_cut + "&& njets==2)").c_str(),lumi,"tree/tree");
+  double yld_jet3= yield(path, (jet2_cut + "&& njets==3)").c_str(),lumi,"tree/tree");
 
-
-
-
+  std::cout<<yld_noCUT<<std::endl;
+  std::cout<<yld_jet1<<std::endl;
+  std::cout<<yld_jet2<<std::endl;
+  std::cout<<yld_jet3<<std::endl;
 
 
 

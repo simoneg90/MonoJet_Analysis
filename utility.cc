@@ -82,3 +82,20 @@ void LS_config(std::string rootFile, std::string outfile){
   system(Form("./ls_script.sh %s | tee %s",rootFile.c_str(),outfile.c_str()));
 
 }
+
+//Questa funzione calcola il numero di eventi presenti in un istogramma - ATTENZIONE alla variabile che si usa  per l'hist!!!
+double yield(const char* path, const char* cut, double rescale = 1.0, const char* treename){
+
+  TFile* file = new TFile(path);
+  TTree* tree = (TTree*)file->Get(treename);
+  if (!tree) tree = (TTree*)file->Get("tree");
+  tree->Draw("nelectrons>>hist(1, 0, 1000)", cut);
+  TH1* hist = (TH1F*)gDirectory->Get("hist");
+  hist->Scale(rescale);
+  double yld = hist->GetBinContent(1);
+  file->Close();
+  return yld;
+
+}
+
+
