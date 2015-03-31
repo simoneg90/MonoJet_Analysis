@@ -18,6 +18,22 @@ void breakLine(){
 
 }
 
+Questa funzione stampa una stringa all'interno di un riquadro                                                                                                                    
+void frame(std::string stringa){
+
+  std::cout<<""<<std::endl;
+  for (int i=0; i<(stringa.size()+6); ++i){
+    std::cout<<"+";
+  }
+  std::cout<<""<<std::endl;
+  std::cout<<"+  "<<stringa.c_str()<<"  +"<<std::endl;
+  for(int i=0; i<(stringa.size()+6); ++i){
+    std::cout<<"+";
+  }
+  std::cout<<"\n"<<std::endl;
+
+}
+
 //Questa funzione implementa le caratteristiche di un istogramma TH1D
 void TH1D_config(TH1D *histo, const char* title, const char* title_x, const char* title_y, int color){
 
