@@ -105,10 +105,12 @@ double yield(const char* path, const char* cut, double rescale = 1.0, const char
   TFile* file = new TFile(path);
   TTree* tree = (TTree*)file->Get(treename);
   if (!tree) tree = (TTree*)file->Get("tree");
-  tree->Draw("nelectrons>>hist(1, 0, 1000)", cut);
+  //tree->Draw("nelectrons>>hist(1, 0, 2000)", cut);
+  tree->Draw("signaljetpt>>hist(1, 0, 2000)", cut);
   TH1* hist = (TH1F*)gDirectory->Get("hist");
   hist->Scale(rescale);
-  double yld = hist->GetBinContent(1);
+  //double yld = hist->GetBinContent(1);
+  double yld = hist->Integral(0,2);
   file->Close();
   return yld;
 
