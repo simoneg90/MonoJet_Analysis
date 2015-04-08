@@ -8,3 +8,4 @@
 #define jet1ETA "2.4"
 #define jet2PT "30"
 #define jet2ETA "4.5"
+#define DeltaPHI "2.5"
