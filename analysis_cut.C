@@ -1,13 +1,18 @@
 //This program makes CUT & COUNT Analysis
 
+#include <stdio.h>
+//#include <unistd.h> library for sleep function
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <time.h>
 
 #include "TStopwatch.h"
 
 #include "utility.cc"
 #include "cuts.h"
+
+#define files 6
 
 void analysis_cut(){
 
@@ -15,24 +20,24 @@ void analysis_cut(){
   double lumi = isData ? 1.0 : 19.7;
   std::string choice;
   int param;
-  const char* path[5];
+  const char* path[files];
   path[0] = "/cmshome/gellisim/MonoJet/MonoJet7XTrees/znunu/tree.root"; //path to analyse....maybe better to put it from outside
   path[1] = "/cmshome/gellisim/MonoJet/MonoJet7XTrees/wjets/tree.root";
   path[2] = "/cmshome/gellisim/MonoJet/MonoJet7XTrees/zjets/tree.root";
   path[3] = "/cmshome/gellisim/MonoJet/MonoJet7XTrees/ttbar/tree.root";
-  path[4] = "/cmshome/gellisim/MonoJet/MonoJet7XTrees/dmVM10/tree.root";
+  path[4] = "/cmshome/gellisim/MonoJet/MonoJet7XTrees/qcd/tree.root";
+  path[5] = "/cmshome/gellisim/MonoJet/MonoJet7XTrees/dmVM10/tree.root";
 
   TStopwatch time;
   time.Start(true);
   frame("Choose the dataset to use");
-  std::cout<<"Do you want to use only the first path? [y/n]"<<std::endl;
+  std::cout<<"Do you want to use only the first path? [y/n]   ";
   std::cin>>choice;
 
   while(strcmp(choice.c_str(), "y")!=0 && strcmp(choice.c_str(),"n")!=0){
 
     std::cout<<"wrong answer! Try again!"<<std::endl;
     std::cout<<"Do you want to use only the first path? [y/n]"<<std::endl;
-    std::cin>>choice;
   }
 
   if(strcmp(choice.c_str(),"y")==0){
@@ -40,13 +45,10 @@ void analysis_cut(){
     param=1;
   }else{
     std::cout<<"Ok, I'll check all the datasets!"<<std::endl;
-    param=5;
+    param=files;
   }
-  std::cout<<choice<<std::endl;
 
-  std::string test="21";
-  //std::stringstream str[5]={"","","","",""}; //string for cuts
-  std::stringstream str;
+  std::stringstream str;  //string for cuts
 
   frame("Building the string for cuts!!!");
 
@@ -65,31 +67,24 @@ void analysis_cut(){
   std::string mumet2_cut       = tau_cut + "&& mumet>400";
   std::string mumet3_cut       = tau_cut + "&& mumet>500";
 
-  std::cout<<"Prova stringa: "<<jet1_cut<<std::endl;
-
-  std::cout<<"Prova stringa: "<<jet2_cut<<std::endl;
-
   //Yield variables definition
   int yld_noCUT[5],yld_MET[5],yld_jet1[5],yld_jet2[5],yld_deltaPhi[5],yld_jet3[5],yld_muon[5],yld_elec[5],yld_tau[5],yld_mumet1[5],yld_mumet2[5],yld_mumet3[5];
 
   for(int i=0; i<param; ++i){
     if (i==0 || i==2) K_Factor= "1.27";
     if(i==1) K_Factor="1.23";
+
     frame("Analysis info");
     std::cout<<"File: "<<path[i]<<std::endl;
     std::cout<<"K-Factor: "<<K_Factor<<std::endl;
+
     //str[i]<<K_Factor[i]<<" * ";
     //str[i]<< (!isData ? " wgt *" : "")<<"("; 
     yld_noCUT[i]    = yield(path[i], (K_Factor + " * " + str.str()+"1)").c_str(), 5, "tree/tree");
-    std::cout<<"TEST! "<<(K_Factor + " * " + str.str()+"1)").c_str()<<std::endl;
-    std::cout<<"TEST2! "<<(K_Factor + " * " +  met_cut + ")").c_str()<<std::endl;
     yld_MET[i]      = yield(path[i], (K_Factor + " * " + met_cut + ")").c_str(), 5, "tree/tree");
     yld_jet1[i]     = yield(path[i], (K_Factor + " * " + jet1_cut + ")").c_str(), 5, "tree/tree");
-    std::cout<<(K_Factor + " * " +  jet1_cut + ")").c_str()<<std::endl;
     yld_jet2[i]     = yield(path[i], (K_Factor + " * " +  + jet2_cut + ")").c_str(),5,"tree/tree");
-    std::cout<<(K_Factor + " * "  + jet2_cut + ")").c_str()<<std::endl;
     yld_deltaPhi[i] = yield(path[i], (K_Factor + " * " +  jet_deltaPHI_cut + ")").c_str(),5,"tree/tree");
-    std::cout<<(K_Factor + " * " +  jet_deltaPHI_cut + ")").c_str()<<std::endl;
     yld_jet3[i]     = yield(path[i], (K_Factor + " * " +  jet_deltaPHI_cut + "&& njets>2)").c_str(),5,"tree/tree");
     yld_muon[i]     = yield(path[i], (K_Factor + " * " +  muon_cut + ")").c_str(),5,"tree/tree");
     yld_elec[i]     = yield(path[i], (K_Factor + " * " +  elec_cut + ")").c_str(),5,"tree/tree");
