@@ -105,15 +105,41 @@ double yield(const char* path, const char* cut, double rescale = 1.0, const char
   TFile* file = new TFile(path);
   TTree* tree = (TTree*)file->Get(treename);
   if (!tree) tree = (TTree*)file->Get("tree");
-  //tree->Draw("nelectrons>>hist(1, 0, 2000)", cut);
-  tree->Draw("signaljetpt>>hist(1, 0, 2000)", cut);
-  TH1* hist = (TH1F*)gDirectory->Get("hist");
+  TH1D *hist= new TH1D ("hist","hist",1,0,2000);
+  tree->Project("hist","njets", cut);
+  //tree->Draw("njets>>hist(1, 0, 2000)", cut); //da non includere
+  //tree->Draw("signaljetpt>>hist(1, 0, 2000)", cut);
+  //TH1* hist = (TH1F*)gDirectory->Get("hist");  //da non includere
   hist->Scale(rescale);
   //double yld = hist->GetBinContent(1);
-  double yld = hist->Integral(0,2);
+  double yld = hist->Integral();
   file->Close();
   return yld;
 
 }
 
+//Questa funzione calcola il numero di eventi presenti in un istogramma - ATTENZIONE alla variabile che si usa  per l'hist!!!
+std::pair<double, double> yieldwitherror(const char* path, const char* cut, double rescale = 1.0, const char* treename = "tree/tree", const char* histname = "hist") {
+
+  TFile* file = new TFile(path);
+  TTree* tree = (TTree*)file->Get(treename);
+  if (!tree) tree = (TTree*)file->Get("tree");
+  TH1F* hist = new TH1F("hist", "hist", 1, 0, 2000);
+  tree->Project("hist","njets", cut);
+  hist->Scale(rescale);
+  double yld = hist->GetBinContent(1);
+  double ylderr = hist->GetBinError(1);
+  file->Close();
+  return std::pair<double, double>(yld, ylderr);
+}
+
+
+
+//Questa funzione fa il rapporto tra due numeri
+double Ratio(double a, double b){
+
+  //std::cout<<" "<<a/b<<std::endl;
+  return a/b;
+
+}
 
